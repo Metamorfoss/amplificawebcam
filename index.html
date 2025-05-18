@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Amplifica - Acessibilidade em Sala de Aula</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/open-dyslexic@1.0.0/open-dyslexic.min.css" />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <header role="banner">
+        <nav role="navigation" aria-label="Menu principal">
+            <a href="https://metamorfoss.github.io/amplifica/" aria-label="Voltar para a página inicial do Amplifica">
+                <i class="fas fa-home" aria-hidden="true"></i> Voltar
+            </a>
+        </nav>
+        <div class="header-content">
+            <img src="amplifica.png" alt="Logotipo Amplifica" class="header-image" />
+            <p class="header-description">Transformando a lousa em uma ferramenta acessível</p>
+        </div>
+        <div class="logo">
+            <img src="logo.png" alt="Logo da Instituição Parceira" />
+        </div>
+    </header>
+
+    <main id="container" role="main">
+        <div id="media-controls">
+            <button id="start-webcam-btn" class="control-btn" type="button"><i class="fas fa-video" aria-hidden="true"></i> Iniciar Webcam</button>
+            <button id="reset-camera-btn" class="control-btn hidden" type="button"><i class="fas fa-sync-alt" aria-hidden="true"></i> Reiniciar Câmera</button>
+            <button id="switch-camera-btn" class="control-btn hidden" type="button"><i class="fas fa-camera-rotate" aria-hidden="true"></i> Alternar Câmera</button>
+        </div>
+
+        <div id="main-content" class="hidden">
+            <section id="video-section" aria-labelledby="video-section-title">
+                <h2 id="video-section-title" class="visually-hidden">Controle e Visualização da Webcam</h2>
+                <div id="videoWrapper">
+                    <video id="webcam" autoplay playsinline width="1000" height="750" aria-label="Feed da webcam. Use o mouse ou toque para selecionar uma área para zoom ou transcrição."></video>
+                    <div id="overlay" aria-hidden="true"></div>
+                </div>
+                <div class="view-controls" role="tablist" aria-label="Modos de visualização">
+                    <button id="amp-btn" class="view-toggle-btn active" type="button" role="tab" aria-selected="true" aria-controls="zoom-view"><i class="fas fa-search-plus" aria-hidden="true"></i> Zoom</button>
+                    <button id="trs-btn" class="view-toggle-btn" type="button" role="tab" aria-selected="false" aria-controls="transcription-view"><i class="fas fa-file-alt" aria-hidden="true"></i> Transcrever</button>
+                </div>
+            </section>
+
+            <section id="output-section" aria-labelledby="output-section-title">
+                <h2 id="output-section-title" class="visually-hidden">Resultado do Zoom ou Transcrição</h2>
+                <div id="zoom-view" class="output-view" role="tabpanel" aria-labelledby="amp-btn">
+                    <canvas id="zoomCanvas" width="1000" height="750" aria-label="Visualização ampliada da área selecionada na webcam"></canvas>
+                    <button id="zoom-fullscreen-btn" class="fullscreen-btn control-btn" type="button" aria-label="Ampliar zoom em tela cheia">
+                        <i class="fas fa-expand" aria-hidden="true"></i> Tela Cheia (Zoom)
+                    </button>
+                </div>
+
+                <div id="transcription-view" class="output-view hidden" role="tabpanel" aria-labelledby="trs-btn">
+                    <div id="resultbox" aria-atomic="true" aria-live="assertive">
+                        <pre id="resultadoOCR" contenteditable="true" aria-label="Texto reconhecido pela ferramenta. Este campo é editável." tabindex="0"></pre>
+                        <div id="ocr-status" class="status-message" aria-live="polite" aria-atomic="true"></div>
+                        <div class="features">
+                            <div class="export-options">
+                                <label for="exportFormat">Exportar como:</label>
+                                <select id="exportFormat" aria-label="Selecionar formato para exportar texto">
+                                    <option value="txt">TXT</option>
+                                    <option value="pdf">PDF</option>
+                                </select>
+                                <button id="baixar-texto-btn" class="feature-btn" type="button" aria-label="Baixar texto reconhecido no formato selecionado">
+                                    <i class="fas fa-download" aria-hidden="true"></i> Baixar
+                                </button>
+                            </div>
+                            <button id="narrar-texto-btn" class="feature-btn" type="button" aria-label="Narrar texto reconhecido">
+                                <i class="fas fa-volume-up" aria-hidden="true"></i> Narrar
+                            </button>
+                        </div>
+                    </div>
+                    <div id="fullscreen-text-zoom-controls" aria-label="Controles de zoom do texto em tela cheia">
+                        <button id="fullscreen-zoom-out-btn" type="button" aria-label="Diminuir zoom do texto">
+                            <i class="fas fa-search-minus" aria-hidden="true"></i>
+                        </button>
+                        <button id="fullscreen-zoom-in-btn" type="button" aria-label="Aumentar zoom do texto">
+                            <i class="fas fa-search-plus" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <button id="transcription-fullscreen-btn" class="fullscreen-btn control-btn" type="button" aria-label="Exibir transcrição em tela cheia">
+                        <i class="fas fa-expand" aria-hidden="true"></i> Tela Cheia (Texto)
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div id="accessibility-widget">
+        <button id="toggle-accessibility-panel-btn" type="button" aria-label="Abrir menu de acessibilidade" aria-expanded="false" aria-controls="accessibility-options">
+            <i class="fas fa-universal-access" aria-hidden="true"></i>
+        </button>
+        <div id="accessibility-options" class="hidden" role="dialog" aria-labelledby="accessibility-title" aria-modal="true" tabindex="-1">
+            <h3 id="accessibility-title" tabindex="-1">Opções de Acessibilidade</h3>
+            <label for="high-contrast-toggle">
+                <input type="checkbox" id="high-contrast-toggle" />
+                Alto Contraste
+            </label>
+            <label for="dyslexic-font-toggle">
+                <input type="checkbox" id="dyslexic-font-toggle" />
+                Fonte para Dislexia (OpenDyslexic)
+            </label>
+
+            <fieldset class="accessibility-group">
+                <legend>Modos para Daltonismo:</legend>
+                <label><input type="radio" name="colorblind-mode" value="none" checked /> Normal</label>
+                <label><input type="radio" name="colorblind-mode" value="protanopia" /> Protanopia</label>
+                <label><input type="radio" name="colorblind-mode" value="deuteranopia" /> Deuteranopia</label>
+                <label><input type="radio" name="colorblind-mode" value="tritanopia" /> Tritanopia</label>
+                <label><input type="radio" name="colorblind-mode" value="achromatopsia" /> Acromatopsia</label>
+            </fieldset>
+
+            <div class="font-controls accessibility-group">
+                <span id="font-size-label">Tamanho da Fonte (Texto Transcrito):</span>
+                <div id="font-size-controls" role="group" aria-labelledby="font-size-label">
+                    <button id="decrease-font-btn" type="button" aria-label="Diminuir tamanho da fonte">-</button>
+                    <span id="font-size-value" aria-live="polite">16px</span>
+                    <button id="increase-font-btn" type="button" aria-label="Aumentar tamanho da fonte">+</button>
+                </div>
+                <label for="font-size-slider" class="visually-hidden">Seletor de ajuste fino do tamanho da fonte</label>
+                <input type="range" id="font-size-slider" min="12" max="32" value="16" step="2" aria-label="Ajustar tamanho da fonte com controle deslizante" aria-controls="font-size-value" />
+            </div>
+             <button id="close-accessibility-panel-btn" class="control-btn" type="button" aria-label="Fechar menu de acessibilidade"><i class="fas fa-times" aria-hidden="true"></i> Fechar</button>
+        </div>
+    </div>
+    <script src="script2.js" defer></script>
+</body>
+</html>
