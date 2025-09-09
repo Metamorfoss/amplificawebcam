@@ -30,6 +30,7 @@ const narrarTextoBtn = document.getElementById('narrar-texto-btn');
 const mainContent = document.getElementById('main-content');
 const zoomView = document.getElementById('zoom-view');
 const transcriptionView = document.getElementById('transcription-view');
+const captureImageBtn = document.getElementById('capture-image-btn'); //novo
 
 const toggleAccessibilityPanelBtn = document.getElementById('toggle-accessibility-panel-btn');
 const closeAccessibilityPanelBtn = document.getElementById('close-accessibility-panel-btn');
@@ -88,6 +89,7 @@ function setupGlobalEventListeners() {
     if(startWebcamBtn) startWebcamBtn.addEventListener('click', () => initWebcam());
     if(resetCameraBtn) resetCameraBtn.addEventListener('click', resetWebcam);
     if(switchCameraBtn) switchCameraBtn.addEventListener('click', switchCamera);
+    if(captureImageBtn) captureImageBtn.addEventListener('click', captureZoomedImage);//novo
 
     if(videoWrapper) {
         videoWrapper.addEventListener('mousedown', startSelection);
@@ -336,4 +338,28 @@ function handleFullscreenChange() {
 function zoomInFullscreenText() { if (fullscreenTextCurrentFontSize < FULLSCREEN_TEXT_MAX_FONT_SIZE) { fullscreenTextCurrentFontSize += FULLSCREEN_TEXT_FONT_STEP; if(resultadoOCR) resultadoOCR.style.fontSize = `${fullscreenTextCurrentFontSize}px`; } }
 function zoomOutFullscreenText() { if (fullscreenTextCurrentFontSize > FULLSCREEN_TEXT_MIN_FONT_SIZE) { fullscreenTextCurrentFontSize -= FULLSCREEN_TEXT_FONT_STEP; if(resultadoOCR) resultadoOCR.style.fontSize = `${fullscreenTextCurrentFontSize}px`; } }
 
+//função de captura
+function captureZoomedImage() {
+    if (!zoomCanvas) return;
+    
+    try {
+        // Criar um link de download
+        const link = document.createElement('a');
+        link.download = `amplifica_captura_${new Date().toISOString().slice(0,19).replace(/:/g, '-')}.png`;
+        
+        // Converter canvas para URL de dados
+        link.href = zoomCanvas.toDataURL('image/png');
+        
+        // Disparar o download
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        // Feedback para o usuário
+        if(ocrStatus) ocrStatus.textContent = "Imagem capturada com sucesso!";
+    } catch (error) {
+        console.error("Erro ao capturar imagem:", error);
+        if(ocrStatus) ocrStatus.textContent = "Erro ao capturar imagem.";
+    }
+}
 console.log("Amplifica Script Carregado com todas as funcionalidades. Lembre-se de configurar as chaves do Azure!");

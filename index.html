@@ -50,9 +50,14 @@
                 <h2 id="output-section-title" class="visually-hidden">Resultado do Zoom ou Transcrição</h2>
                 <div id="zoom-view" class="output-view" role="tabpanel" aria-labelledby="amp-btn">
                     <canvas id="zoomCanvas" width="1000" height="750" aria-label="Visualização ampliada da área selecionada na webcam"></canvas>
-                    <button id="zoom-fullscreen-btn" class="fullscreen-btn control-btn" type="button" aria-label="Ampliar zoom em tela cheia">
-                        <i class="fas fa-expand" aria-hidden="true"></i> Tela Cheia (Zoom)
-                    </button>
+                    <div class="zoom-controls-container">
+                        <button id="zoom-fullscreen-btn" class="fullscreen-btn control-btn" type="button" aria-label="Ampliar zoom em tela cheia">
+                            <i class="fas fa-expand" aria-hidden="true"></i> Tela Cheia (Zoom)
+                        </button>
+                        <button id="capture-image-btn" class="fullscreen-btn control-btn" type="button" aria-label="Capturar imagem ampliada">
+                            <i class="fas fa-camera" aria-hidden="true"></i> Capturar Imagem
+                        </button>
+                    </div>
                 </div>
 
                 <div id="transcription-view" class="output-view hidden" role="tabpanel" aria-labelledby="trs-btn">
