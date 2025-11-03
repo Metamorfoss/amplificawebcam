@@ -21,6 +21,7 @@
     --hc-border-color: #ffffff;
 }
 
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--text-color-dark); background-color: var(--background-light); line-height: 1.6; font-size: 16px; min-height: 100vh; display: flex; flex-direction: column; transition: var(--transition-normal); }
 
@@ -95,7 +96,7 @@ header nav a:hover { background-color: rgba(255, 255, 255, 0.1); color: var(--hi
     background-color: rgba(0,0,0,0.8);
 }
 
-#accessibility-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
+/* #accessibility-widget { position: fixed; bottom: 20px; left: 20px; z-index: 1000; }
 #toggle-accessibility-panel-btn { width: 55px; height: 55px; background: linear-gradient(135deg, var(--secondary-color), var(--accent-color)); border: none; border-radius: 50%; cursor: pointer; box-shadow: var(--box-shadow-heavy); transition: var(--transition-normal); color: var(--text-color-light); font-size: 1.5rem; display: flex; align-items: center; justify-content: center; }
 #toggle-accessibility-panel-btn:hover { transform: scale(1.1) rotate(10deg); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3); }
 #toggle-accessibility-panel-btn[aria-expanded="true"] { transform: rotate(45deg); }
@@ -136,7 +137,7 @@ body.dyslexic-font, .dyslexic-font #resultadoOCR, .dyslexic-font #accessibility-
 body.protanopia-mode { filter: hue-rotate(-55deg) saturate(1.8); }
 body.deuteranopia-mode { filter: hue-rotate(55deg) saturate(1.8); }
 body.tritanopia-mode { filter: hue-rotate(180deg) saturate(1.5) brightness(0.9); }
-body.achromatopsia-mode { filter: grayscale(100%) contrast(130%); }
+body.achromatopsia-mode { filter: grayscale(100%) contrast(130%); }*/
 
 .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; margin: -1px !important; padding: 0 !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; border: 0 !important; white-space: nowrap !important; }
 .hidden { display: none !important; }
@@ -144,19 +145,215 @@ body.achromatopsia-mode { filter: grayscale(100%) contrast(130%); }
 #zoom-view:-webkit-full-screen, #zoom-view:-moz-full-screen, #zoom-view:-ms-fullscreen, #zoom-view:fullscreen { width: 100%; height: 100%; background-color: #000; }
 #zoom-view:fullscreen #zoomCanvas { width: 100%; height: 100%; object-fit: contain; border-radius: 0; box-shadow: none; }
 #zoom-view:fullscreen > .fullscreen-btn { display: none !important; }
-
+/*
 #transcription-view:-webkit-full-screen, #transcription-view:-moz-full-screen, #transcription-view:-ms-fullscreen, #transcription-view:fullscreen { width: 100%; height: 100%; padding: 0; background-color: var(--text-color-light); display: flex; flex-direction: column; }
 #transcription-view:fullscreen #resultbox { width: 100%; height: 100%; box-shadow: none; border-radius: 0; padding-bottom: 90px; display: flex; flex-direction: column; }
 #transcription-view:fullscreen #resultadoOCR { padding: 2rem 2.5rem; flex-grow: 1; height: auto; overflow-y: auto; }
 #transcription-view:fullscreen .status-message, #transcription-view:fullscreen .features,
 #transcription-view:fullscreen > .fullscreen-btn:not(#fullscreen-text-zoom-controls button) { display: none !important; }
-
+*/
 #fullscreen-text-zoom-controls { position: fixed; bottom: 20px; left: 50%; z-index: 2100; background-color: rgba(42, 42, 90, 0.85); padding: 0.75rem 1.25rem; border-radius: var(--border-radius); box-shadow: var(--box-shadow-heavy); display: flex; gap: 1.5rem; opacity:  extreme; visibility: hidden; transform: translateX(-50%) translateY(20px); transition: opacity 0.3s ease, visibility 0.3s ease, transform 0.3s extreme; }
-#fullscreen-text-zoom-controls.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); }
+#fullscreen-text-zoom-controls.visible { opacity: 1; visibility: visible; transform: translateX(-50%) translateY(0); } 
 
 #fullscreen-text-zoom-controls button { background-color: var(--accent-color); color: var(--text-color-light); border: none; width: 60px; height: 60px; border-radius: 50%; font-size: 1.8rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background-color var(--transition-fast), transform 0.1s ease; box-shadow: var(--box-shadow); }
 #fullscreen-text-zoom-controls button:hover { background-color: var(--highlight-color); color: #000000; }
-#fullscreen-text-zoom-controls button:active { transform: scale(0.95); }
+#fullscreen-text-zoom-controls button:active { transform: scale(0.95); } 
+
+
+.accessibility-group { border: 1px solid #ddd; padding: 0.8rem; border-radius: 15px; margin-top: 0.5rem; }
+.accessibility-group legend { font-weight: bold; color: var(--secondary-color); padding: 0 0.5rem; font-size: 0.9rem;}
+.font-controls span:first-child { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; }
+
+/* Acessibilidade */
+#accessibility-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 1000;
+}
+
+#accessibility-btn > button {
+  width: 50px;
+  height: 50px;
+  background: linear-gradient(135deg, var(--secondary-color), var(--accent-color));
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+  color: white;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#accessibility-btn > button:hover {
+  transform: scale(1.1) rotate(15deg);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+#accessibility-options {
+  background: #fff;
+  color: #000;
+  border-radius: 14px;
+  padding: 20px;
+  margin-top: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+  width: 250px;
+  position: absolute;
+  bottom: 65px;
+  right: 0;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: all 0.3s ease;
+  pointer-events: none;
+}
+
+#accessibility-options:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+}
+
+#accessibility-options label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+#accessibility-options input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+.font-controls {
+  margin: 15px 0;
+}
+
+.font-controls span {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+#font-size-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+#font-size-controls button {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: var(--secondary-color);
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s;
+}
+
+#font-size-controls button:hover {
+  background: var(--accent-color);
+}
+
+#font-size-value {
+  min-width: 40px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+#accessibility-options input[type="range"] {
+  width: 100%;
+  margin-top: 5px;
+}
+
+#accessibility-options button[onclick="lerTexto()"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  background: var(--secondary-color);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+#accessibility-options button[onclick="lerTexto()"]:hover {
+  background: var(--accent-color);
+}
+
+/* Modos de Acessibilidade */
+.high-contrast {
+  --bg-color: #000 !important;
+  --text-color: #fff !important;
+  --light-color: #222 !important;
+  color: #fff !important;
+  background-color: #000 !important;
+}
+
+.high-contrast header {
+  background-color: #000 !important;
+  border-bottom: 1px solid #fff !important;
+}
+
+.high-contrast .feature,
+.high-contrast .step,
+.high-contrast .benefits {
+  background-color: #222 !important;
+  color: #fff !important;
+  border: 1px solid #fff !important;
+}
+
+.high-contrast .feature p,
+.high-contrast .step p {
+  color: #ccc !important;
+}
+
+.dyslexic-font {
+  font-family: 'Comic Sans MS', 'OpenDyslexic', sans-serif;
+  letter-spacing: 1px;
+  line-height: 1.8;
+}
+
+.protanopia-mode {
+  filter: hue-rotate(-50deg) saturate(0.8);
+}
+
+.deuteranopia-mode {
+  filter: hue-rotate(50deg) saturate(0.8);
+}
+
+.tritanopia-mode {
+  filter: hue-rotate(180deg) saturate(0.7);
+}
+
+.achromatopsia-mode {
+  filter: grayscale(100%) contrast(120%);
+}
+
+.high-contrast .faq-wrapper,
+.high-contrast .accordion {
+  background-color: #222 !important;
+  border-color: #fff !important;
+}
+
+.high-contrast .question {
+  color: #fff !important;
+}
+
+.high-contrast .answer {
+  color: #ccc !important;
+}
+
+.high-contrast .accordion.open .question {
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0)) !important;
+}
 
 @media (max-width: 1200px) {
     #main-content { flex-direction: column; align-items: center; }
@@ -196,6 +393,6 @@ body.achromatopsia-mode { filter: grayscale(100%) contrast(130%); }
     }
 }
 
-*:focus { outline: none; }
+/* *:focus { outline: none; }
 *:focus-visible { outline: 3px solid var(--highlight-color) !important; outline-offset: 2px; box-shadow: 0 0 0 5px rgba(76, 76, 158, 0.5) !important; border-radius: var(--border-radius); }
-#accessibility-options *:focus-visible { outline-color: var(--accent-color) !important; box-shadow: 0 0 0 5px rgba(76, 76, 158, 0.3) !important; }
+#accessibility-options *:focus-visible { outline-color: var(--accent-color) !important; box-shadow: 0 0 0 5px rgba(76, 76, 158, 0.3) !important; } */
