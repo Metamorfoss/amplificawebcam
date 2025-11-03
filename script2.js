@@ -32,17 +32,17 @@ const zoomView = document.getElementById('zoom-view');
 const transcriptionView = document.getElementById('transcription-view');
 const captureImageBtn = document.getElementById('capture-image-btn'); //novo
 
-const toggleAccessibilityPanelBtn = document.getElementById('toggle-accessibility-panel-btn');
-const closeAccessibilityPanelBtn = document.getElementById('close-accessibility-panel-btn');
-const accessibilityOptionsPanel = document.getElementById('accessibility-options');
-const accessibilityPanelTitle = document.getElementById('accessibility-title');
-const highContrastToggle = document.getElementById('high-contrast-toggle');
-const dyslexicFontToggle = document.getElementById('dyslexic-font-toggle');
-const decreaseFontBtn = document.getElementById('decrease-font-btn');
-const increaseFontBtn = document.getElementById('increase-font-btn');
-const fontSizeSlider = document.getElementById('font-size-slider');
-const fontSizeValueDisplay = document.getElementById('font-size-value');
-const colorblindModeRadios = document.querySelectorAll('input[name="colorblind-mode"]');
+// const toggleAccessibilityPanelBtn = document.getElementById('toggle-accessibility-panel-btn');
+// const closeAccessibilityPanelBtn = document.getElementById('close-accessibility-panel-btn');
+// const accessibilityOptionsPanel = document.getElementById('accessibility-options');
+// const accessibilityPanelTitle = document.getElementById('accessibility-title');
+// const highContrastToggle = document.getElementById('high-contrast-toggle');
+// const dyslexicFontToggle = document.getElementById('dyslexic-font-toggle');
+// const decreaseFontBtn = document.getElementById('decrease-font-btn');
+// const increaseFontBtn = document.getElementById('increase-font-btn');
+// const fontSizeSlider = document.getElementById('font-size-slider');
+// const fontSizeValueDisplay = document.getElementById('font-size-value');
+// const colorblindModeRadios = document.querySelectorAll('input[name="colorblind-mode"]');
 
 let currentStream = null;
 let selection = null;
@@ -70,12 +70,25 @@ const fullscreenZoomOutBtn = document.getElementById('fullscreen-zoom-out-btn');
 
 
 document.addEventListener('DOMContentLoaded', () => {
+    hidePanelsUntilStart(); // garante painéis ocultos inicialmente
     setupGlobalEventListeners();
     setupAccessibilityFeatures();
     applyPanelFontSize(); // Garante que o tamanho de fonte inicial do painel seja aplicado ao #resultadoOCR
     checkAzureConfig();
     checkCameraSupportAndSetupButton();
 });
+
+function hidePanelsUntilStart() {
+    // Elementos que devem ficar ocultos até o usuário iniciar a webcam
+    const toHide = [mainContent, zoomView, transcriptionView, videoWrapper, overlay, zoomCanvas, resetCameraBtn, switchCameraBtn, ampBtn, trsBtn, captureImageBtn];
+    toHide.forEach(el => {
+        if (!el) return;
+        try { el.classList.add('hidden'); } catch (e) {}
+        try { el.style.display = 'none'; } catch (e) {}
+    });
+    // garante que o botão Iniciar permaneça visível
+    if (startWebcamBtn) { try { startWebcamBtn.classList.remove('hidden'); startWebcamBtn.style.display = ''; } catch (e) {} }
+}
 
 function checkAzureConfig() {
     if (AZURE_CONFIG.SUBSCRIPTION_KEY_VISION === "SUA_CHAVE_AZURE_COMPUTER_VISION" || AZURE_CONFIG.ENDPOINT_VISION === "SEU_ENDPOINT_AZURE_COMPUTER_VISION" || AZURE_CONFIG.SUBSCRIPTION_KEY_SPEECH === "SUA_CHAVE_AZURE_SPEECH_SERVICE" || AZURE_CONFIG.REGION_SPEECH === "sua-regiao") {
@@ -86,7 +99,7 @@ function checkAzureConfig() {
 }
 
 function setupGlobalEventListeners() {
-    if(startWebcamBtn) startWebcamBtn.addEventListener('click', () => initWebcam());
+    if(startWebcamBtn) startWebcamBtn.addEventListener('click', handleStartClick);
     if(resetCameraBtn) resetCameraBtn.addEventListener('click', resetWebcam);
     if(switchCameraBtn) switchCameraBtn.addEventListener('click', switchCamera);
     if(captureImageBtn) captureImageBtn.addEventListener('click', captureZoomedImage);//novo
@@ -115,32 +128,32 @@ function setupGlobalEventListeners() {
     );
 }
 
-function setupAccessibilityFeatures() {
-    if (toggleAccessibilityPanelBtn) toggleAccessibilityPanelBtn.addEventListener('click', toggleAccessibilityPanel);
-    if (closeAccessibilityPanelBtn) closeAccessibilityPanelBtn.addEventListener('click', toggleAccessibilityPanel);
-    if (highContrastToggle) highContrastToggle.addEventListener('change', handleHighContrastToggle);
-    if (dyslexicFontToggle) dyslexicFontToggle.addEventListener('change', handleDyslexicFontToggle);
-    if (colorblindModeRadios) colorblindModeRadios.forEach(radio => radio.addEventListener('change', (e) => { if (e.target.checked) applyColorBlindMode(e.target.value); }));
-    if (decreaseFontBtn) decreaseFontBtn.addEventListener('click', () => updatePanelFontSize('decrease'));
-    if (increaseFontBtn) increaseFontBtn.addEventListener('click', () => updatePanelFontSize('increase'));
-    if (fontSizeSlider) fontSizeSlider.addEventListener('input', (e) => updatePanelFontSize(parseInt(e.target.value)));
-    document.addEventListener('keydown', accessibilityEscapeKeyListener);
-}
+// function setupAccessibilityFeatures() {
+//     if (toggleAccessibilityPanelBtn) toggleAccessibilityPanelBtn.addEventListener('click', toggleAccessibilityPanel);
+//     if (closeAccessibilityPanelBtn) closeAccessibilityPanelBtn.addEventListener('click', toggleAccessibilityPanel);
+//     if (highContrastToggle) highContrastToggle.addEventListener('change', handleHighContrastToggle);
+//     if (dyslexicFontToggle) dyslexicFontToggle.addEventListener('change', handleDyslexicFontToggle);
+//     if (colorblindModeRadios) colorblindModeRadios.forEach(radio => radio.addEventListener('change', (e) => { if (e.target.checked) applyColorBlindMode(e.target.value); }));
+//     if (decreaseFontBtn) decreaseFontBtn.addEventListener('click', () => updatePanelFontSize('decrease'));
+//     if (increaseFontBtn) increaseFontBtn.addEventListener('click', () => updatePanelFontSize('increase'));
+//     if (fontSizeSlider) fontSizeSlider.addEventListener('input', (e) => updatePanelFontSize(parseInt(e.target.value)));
+//     document.addEventListener('keydown', accessibilityEscapeKeyListener);
+// }
 
-function toggleAccessibilityPanel() {
-    if (!accessibilityOptionsPanel || !toggleAccessibilityPanelBtn) { console.error("Elementos do painel de acessibilidade não encontrados."); return; }
-    const isHidden = accessibilityOptionsPanel.classList.toggle('hidden'); const isExpanded = !isHidden;
-    toggleAccessibilityPanelBtn.setAttribute('aria-expanded', isExpanded.toString());
-    if (isExpanded) {
-        lastFocusedElementBeforePanel = document.activeElement;
-        if (accessibilityPanelTitle && typeof accessibilityPanelTitle.focus === 'function') accessibilityPanelTitle.focus();
-        else accessibilityOptionsPanel.focus();
-        accessibilityOptionsPanel.addEventListener('keydown', trapFocusInPanel);
-    } else {
-        accessibilityOptionsPanel.removeEventListener('keydown', trapFocusInPanel);
-        if (lastFocusedElementBeforePanel && typeof lastFocusedElementBeforePanel.focus === 'function') lastFocusedElementBeforePanel.focus();
-    }
-}
+// function toggleAccessibilityPanel() {
+//     if (!accessibilityOptionsPanel || !toggleAccessibilityPanelBtn) { console.error("Elementos do painel de acessibilidade não encontrados."); return; }
+//     const isHidden = accessibilityOptionsPanel.classList.toggle('hidden'); const isExpanded = !isHidden;
+//     toggleAccessibilityPanelBtn.setAttribute('aria-expanded', isExpanded.toString());
+//     if (isExpanded) {
+//         lastFocusedElementBeforePanel = document.activeElement;
+//         if (accessibilityPanelTitle && typeof accessibilityPanelTitle.focus === 'function') accessibilityPanelTitle.focus();
+//         else accessibilityOptionsPanel.focus();
+//         accessibilityOptionsPanel.addEventListener('keydown', trapFocusInPanel);
+//     } else {
+//         accessibilityOptionsPanel.removeEventListener('keydown', trapFocusInPanel);
+//         if (lastFocusedElementBeforePanel && typeof lastFocusedElementBeforePanel.focus === 'function') lastFocusedElementBeforePanel.focus();
+//     }
+// }
 
 function trapFocusInPanel(e) {
     if (e.key !== 'Tab' || !accessibilityOptionsPanel) return;
@@ -152,30 +165,30 @@ function trapFocusInPanel(e) {
     else { if (document.activeElement === lastFocusable) { firstFocusable.focus(); e.preventDefault(); } else if (!focusableElements.includes(document.activeElement)) { firstFocusable.focus(); e.preventDefault(); } }
 }
 
-function accessibilityEscapeKeyListener(e) { if (e.key === 'Escape' && accessibilityOptionsPanel && !accessibilityOptionsPanel.classList.contains('hidden')) toggleAccessibilityPanel(); }
-function handleHighContrastToggle() { if (highContrastToggle) { document.body.classList.toggle('high-contrast', highContrastToggle.checked); console.log("Alto contraste: ", highContrastToggle.checked); } else console.error("Elemento highContrastToggle não encontrado."); }
-function handleDyslexicFontToggle() { if (dyslexicFontToggle) { document.body.classList.toggle('dyslexic-font', dyslexicFontToggle.checked); console.log("Fonte disléxica: ", dyslexicFontToggle.checked); } else console.error("Elemento dyslexicFontToggle não encontrado."); }
+// function accessibilityEscapeKeyListener(e) { if (e.key === 'Escape' && accessibilityOptionsPanel && !accessibilityOptionsPanel.classList.contains('hidden')) toggleAccessibilityPanel(); }
+// function handleHighContrastToggle() { if (highContrastToggle) { document.body.classList.toggle('high-contrast', highContrastToggle.checked); console.log("Alto contraste: ", highContrastToggle.checked); } else console.error("Elemento highContrastToggle não encontrado."); }
+// function handleDyslexicFontToggle() { if (dyslexicFontToggle) { document.body.classList.toggle('dyslexic-font', dyslexicFontToggle.checked); console.log("Fonte disléxica: ", dyslexicFontToggle.checked); } else console.error("Elemento dyslexicFontToggle não encontrado."); }
 
-function applyColorBlindMode(mode) {
-    const modes = ["protanopia-mode", "deuteranopia-mode", "tritanopia-mode", "achromatopsia-mode"];
-    modes.forEach(m => { if (document.body.classList.contains(m)) document.body.classList.remove(m); });
-    if (mode && mode !== "none") { document.body.classList.add(mode); console.log(`Modo daltonismo aplicado: ${mode}`); }
-    else console.log("Modo daltonismo desativado (normal).");
-}
+// function applyColorBlindMode(mode) {
+//     const modes = ["protanopia-mode", "deuteranopia-mode", "tritanopia-mode", "achromatopsia-mode"];
+//     modes.forEach(m => { if (document.body.classList.contains(m)) document.body.classList.remove(m); });
+//     if (mode && mode !== "none") { document.body.classList.add(mode); console.log(`Modo daltonismo aplicado: ${mode}`); }
+//     else console.log("Modo daltonismo desativado (normal).");
+// }
 
-function applyPanelFontSize() {
-    if (resultadoOCR) resultadoOCR.style.fontSize = `${panelCurrentFontSize}px`; else console.error("Elemento resultadoOCR não encontrado.");
-    if (fontSizeValueDisplay) fontSizeValueDisplay.textContent = `${panelCurrentFontSize}px`; else console.error("Elemento fontSizeValueDisplay não encontrado.");
-    if (fontSizeSlider) fontSizeSlider.value = panelCurrentFontSize; else console.error("Elemento fontSizeSlider não encontrado.");
-}
+// function applyPanelFontSize() {
+//     if (resultadoOCR) resultadoOCR.style.fontSize = `${panelCurrentFontSize}px`; else console.error("Elemento resultadoOCR não encontrado.");
+//     if (fontSizeValueDisplay) fontSizeValueDisplay.textContent = `${panelCurrentFontSize}px`; else console.error("Elemento fontSizeValueDisplay não encontrado.");
+//     if (fontSizeSlider) fontSizeSlider.value = panelCurrentFontSize; else console.error("Elemento fontSizeSlider não encontrado.");
+// }
 
-function updatePanelFontSize(operationOrValue) {
-    let newSize = panelCurrentFontSize;
-    if (operationOrValue === 'increase') newSize = Math.min(PANEL_MAX_FONT_SIZE, panelCurrentFontSize + PANEL_FONT_STEP);
-    else if (operationOrValue === 'decrease') newSize = Math.max(PANEL_MIN_FONT_SIZE, panelCurrentFontSize - PANEL_FONT_STEP);
-    else if (typeof operationOrValue === 'number') newSize = Math.max(PANEL_MIN_FONT_SIZE, Math.min(PANEL_MAX_FONT_SIZE, operationOrValue));
-    if (newSize !== panelCurrentFontSize) { panelCurrentFontSize = newSize; applyPanelFontSize(); console.log(`Tamanho da fonte do painel atualizado para: ${panelCurrentFontSize}px`); }
-}
+// function updatePanelFontSize(operationOrValue) {
+//     let newSize = panelCurrentFontSize;
+//     if (operationOrValue === 'increase') newSize = Math.min(PANEL_MAX_FONT_SIZE, panelCurrentFontSize + PANEL_FONT_STEP);
+//     else if (operationOrValue === 'decrease') newSize = Math.max(PANEL_MIN_FONT_SIZE, panelCurrentFontSize - PANEL_FONT_STEP);
+//     else if (typeof operationOrValue === 'number') newSize = Math.max(PANEL_MIN_FONT_SIZE, Math.min(PANEL_MAX_FONT_SIZE, operationOrValue));
+//     if (newSize !== panelCurrentFontSize) { panelCurrentFontSize = newSize; applyPanelFontSize(); console.log(`Tamanho da fonte do painel atualizado para: ${panelCurrentFontSize}px`); }
+// }
 
 async function checkCameraSupportAndSetupButton() {
     if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) { if(switchCameraBtn) switchCameraBtn.classList.add('hidden'); return; }
@@ -203,9 +216,15 @@ async function initWebcam() {
         currentStream = await navigator.mediaDevices.getUserMedia(constraints);
         if(video) video.srcObject = currentStream;
         if(video) video.onloadedmetadata = () => {
-            if(mainContent) mainContent.classList.remove('hidden'); if(startWebcamBtn) startWebcamBtn.classList.add('hidden'); if(resetCameraBtn) resetCameraBtn.classList.remove('hidden');
-            if(availableVideoDevices.length > 1 && switchCameraBtn) switchCameraBtn.classList.remove('hidden');
-            toggleViewMode(true);
+            // Exibir os painéis agora que a webcam foi iniciada (transcriptionView permanece oculto)
+            const toShow = [mainContent, videoWrapper, zoomView, zoomCanvas, ampBtn, trsBtn, captureImageBtn, resetCameraBtn];
+            toShow.forEach(el => { if (!el) return; try { el.classList.remove('hidden'); el.style.display = ''; } catch (e) {} });
+            // Mantém o painel de transcrição oculto até o usuário pedir
+            if (transcriptionView) { try { transcriptionView.classList.add('hidden'); transcriptionView.style.display = 'none'; } catch (e) {} }
+            if (overlay) { try { overlay.classList.remove('hidden'); overlay.style.display = 'none'; } catch (e) {} } // overlay presente mas escondido
+            if(startWebcamBtn) startWebcamBtn.classList.add('hidden');
+            if(availableVideoDevices.length > 1 && switchCameraBtn) { switchCameraBtn.classList.remove('hidden'); switchCameraBtn.style.display = ''; }
+            toggleViewMode(true); // garante que o zoom seja exibido inicialmente
             const currentSettings = currentStream.getVideoTracks()[0]?.getSettings();
             if (currentSettings?.facingMode) currentFacingMode = currentSettings.facingMode;
         };
@@ -276,7 +295,14 @@ function cancelSelection() { if (isSelecting && overlay) { isSelecting = false; 
 function processSelection() { if (!selection) return; if (!isDrawingZoom) captureAndAnalyze(); }
 function toggleViewMode(showZoom) {
     if (!zoomView || !transcriptionView || !ampBtn || !trsBtn) return;
-    isDrawingZoom = showZoom; zoomView.classList.toggle('hidden', !showZoom); transcriptionView.classList.toggle('hidden', showZoom);
+    isDrawingZoom = showZoom;
+    // controla classes
+    zoomView.classList.toggle('hidden', !showZoom);
+    transcriptionView.classList.toggle('hidden', showZoom);
+    // controla display inline para garantir visibilidade/ocultação
+    try { if (zoomView) zoomView.style.display = showZoom ? '' : 'none'; } catch (e) {}
+    try { if (transcriptionView) transcriptionView.style.display = showZoom ? 'none' : ''; } catch (e) {}
+
     ampBtn.classList.toggle('active', showZoom); trsBtn.classList.toggle('active', !showZoom);
     ampBtn.setAttribute('aria-selected', showZoom.toString()); trsBtn.setAttribute('aria-selected', (!showZoom).toString());
     if (showZoom && currentStream) { requestAnimationFrame(drawZoomedFrame); }
@@ -334,6 +360,13 @@ function handleFullscreenChange() {
     if (isTranscriptionFullscreen) { if(transcriptionView) transcriptionView.classList.add('fullscreen-active'); if(resultadoOCR) resultadoOCR.style.fontSize = `${fullscreenTextCurrentFontSize}px`; }
     else { if (transcriptionView && transcriptionView.classList.contains('fullscreen-active')) { transcriptionView.classList.remove('fullscreen-active'); if(resultadoOCR) resultadoOCR.style.fontSize = `${panelCurrentFontSize}px`; } }
     if(zoomView) zoomView.classList.toggle('fullscreen-active', fullscreenElement === zoomView);
+
+    // Esconde o botão de fullscreen da transcrição quando estiver em tela cheia e mostra ao sair
+    try {
+        if (transcriptionFullscreenBtn) {
+            transcriptionFullscreenBtn.style.display = isTranscriptionFullscreen ? 'none' : '';
+        }
+    } catch (e) { /* ignore */ }
 }
 function zoomInFullscreenText() { if (fullscreenTextCurrentFontSize < FULLSCREEN_TEXT_MAX_FONT_SIZE) { fullscreenTextCurrentFontSize += FULLSCREEN_TEXT_FONT_STEP; if(resultadoOCR) resultadoOCR.style.fontSize = `${fullscreenTextCurrentFontSize}px`; } }
 function zoomOutFullscreenText() { if (fullscreenTextCurrentFontSize > FULLSCREEN_TEXT_MIN_FONT_SIZE) { fullscreenTextCurrentFontSize -= FULLSCREEN_TEXT_FONT_STEP; if(resultadoOCR) resultadoOCR.style.fontSize = `${fullscreenTextCurrentFontSize}px`; } }
@@ -362,4 +395,89 @@ function captureZoomedImage() {
         if(ocrStatus) ocrStatus.textContent = "Erro ao capturar imagem.";
     }
 }
+
+//acessibilidade atualizada
+let currentFontSize = 14; // Tamanho inicial
+
+function togglePanel() {
+  const panel = document.getElementById("accessibility-options");
+  panel.classList.toggle("hidden");
+}
+
+function toggleHighContrast() {
+  document.body.classList.toggle("high-contrast");
+  
+  // Atualiza cores do header no modo alto contraste
+  const header = document.querySelector('header');
+  if (document.body.classList.contains("high-contrast")) {
+    header.style.backgroundColor = '#000';
+    header.style.borderBottom = '1px solid #fff';
+  } else {
+    header.style.backgroundColor = 'rgba(255, 255, 255, 0.86)';
+    header.style.borderBottom = '1px solid rgba(0, 0, 0, 0.05)';
+  }
+}
+
+function toggleDyslexicFont() {
+  document.body.classList.toggle("dyslexic-font");
+}
+
+function toggleColorBlindMode(type) {
+  // Remove todas as classes de daltonismo primeiro
+  document.body.classList.remove("protanopia-mode", "deuteranopia-mode", "tritanopia-mode", "achromatopsia-mode");
+  
+  // Adiciona apenas a classe selecionada
+  if (document.querySelector(`input[onchange="toggleColorBlindMode('${type}')"]`).checked) {
+    document.body.classList.add(`${type}-mode`);
+    localStorage.setItem('colorBlindMode', type);
+  } else {
+    localStorage.removeItem('colorBlindMode');
+  }
+  
+  // Atualiza os outros checkboxes para desmarcados
+  document.querySelectorAll('input[type="checkbox"][onchange^="toggleColorBlindMode"]').forEach(checkbox => {
+    if (checkbox.getAttribute('onchange') !== `toggleColorBlindMode('${type}')`) {
+      checkbox.checked = false;
+    }
+  });
+}
+
+function adjustFontSize(operation) {
+  // Define os limites mínimo e máximo
+  const minSize = 12;
+  const maxSize = 28;
+  const step = 2;
+  
+  // Ajusta o tamanho conforme a operação
+  if (operation === 'increase' && currentFontSize < maxSize) {
+    currentFontSize += step;
+  } else if (operation === 'decrease' && currentFontSize > minSize) {
+    currentFontSize -= step;
+  } else if (typeof operation === 'number') {
+    // Se for um número direto (do range)
+    currentFontSize = operation;
+  }
+  
+  // Garante que está dentro dos limites
+  currentFontSize = Math.max(minSize, Math.min(maxSize, currentFontSize));
+  
+  // Aplica o novo tamanho
+  document.documentElement.style.fontSize = currentFontSize + 'px';
+  document.getElementById('font-size-value').textContent = currentFontSize + 'px';
+  
+  // Atualiza o range slider se existir
+  const rangeInput = document.querySelector('input[type="range"]');
+  if (rangeInput) {
+    rangeInput.value = currentFontSize;
+  }
+}
+
+function handleStartClick() {
+    // Esconde o botão iniciar imediatamente e mostra o botão reiniciar para evitar que o usuário clique duas vezes
+    if (startWebcamBtn) { try { startWebcamBtn.classList.add('hidden'); startWebcamBtn.style.display = 'none'; } catch (e) {} }
+    if (resetCameraBtn) { try { resetCameraBtn.classList.remove('hidden'); resetCameraBtn.style.display = ''; } catch (e) {} }
+    // Inicia a webcam (initWebcam trata de reverter caso haja erro)
+    initWebcam();
+}
+
 console.log("Amplifica Script Carregado com todas as funcionalidades. Lembre-se de configurar as chaves do Azure!");
