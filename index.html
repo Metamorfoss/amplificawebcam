@@ -35,7 +35,7 @@
 
         <div id="main-content" class="hidden">
             <section id="video-section" aria-labelledby="video-section-title">
-                <h2 id="video-section-title" class="visually-hidden">Controle e Visualização da Webcam</h2>
+                <!-- <h2 id="video-section-title" class="visually-hidden">Controle e Visualização da Webcam</h2> -->
                 <div id="videoWrapper">
                     <video id="webcam" autoplay playsinline width="1000" height="750" aria-label="Feed da webcam. Use o mouse ou toque para selecionar uma área para zoom ou transcrição."></video>
                     <div id="overlay" aria-hidden="true"></div>
@@ -47,7 +47,7 @@
             </section>
 
             <section id="output-section" aria-labelledby="output-section-title">
-                <h2 id="output-section-title" class="visually-hidden">Resultado do Zoom ou Transcrição</h2>
+                <!-- <h2 id="output-section-title" class="visually-hidden">Resultado do Zoom ou Transcrição</h2> -->
                 <div id="zoom-view" class="output-view" role="tabpanel" aria-labelledby="amp-btn">
                     <canvas id="zoomCanvas" width="1000" height="750" aria-label="Visualização ampliada da área selecionada na webcam"></canvas>
                     <div class="zoom-controls-container">
@@ -96,43 +96,55 @@
         </div>
     </main>
 
-    <div id="accessibility-widget">
-        <button id="toggle-accessibility-panel-btn" type="button" aria-label="Abrir menu de acessibilidade" aria-expanded="false" aria-controls="accessibility-options">
-            <i class="fas fa-universal-access" aria-hidden="true"></i>
-        </button>
-        <div id="accessibility-options" class="hidden" role="dialog" aria-labelledby="accessibility-title" aria-modal="true" tabindex="-1">
-            <h3 id="accessibility-title" tabindex="-1">Opções de Acessibilidade</h3>
-            <label for="high-contrast-toggle">
-                <input type="checkbox" id="high-contrast-toggle" />
-                Alto Contraste
-            </label>
-            <label for="dyslexic-font-toggle">
-                <input type="checkbox" id="dyslexic-font-toggle" />
-                Fonte para Dislexia (OpenDyslexic)
-            </label>
+    <div id="accessibility-btn">
+    <button onclick="togglePanel()" aria-label="Abrir menu de acessibilidade" style="background-image: url(acessível.jpg); background-size: cover; background-repeat: no-repeat; "> </button>
+    <div id="accessibility-options" class="hidden">
+      <h3 id="accessibility-title" tabindex="-1">Opções de Acessibilidade</h3>
+      <label>
+        <input type="checkbox" onchange="toggleHighContrast()">
+        Alto Contraste
+      </label>
+      <label>
+        <input type="checkbox" onchange="toggleDyslexicFont()">
+        Fonte Disléxica
+      </label>
 
-            <fieldset class="accessibility-group">
-                <legend>Modos para Daltonismo:</legend>
-                <label><input type="radio" name="colorblind-mode" value="none" checked /> Normal</label>
-                <label><input type="radio" name="colorblind-mode" value="protanopia" /> Protanopia</label>
-                <label><input type="radio" name="colorblind-mode" value="deuteranopia" /> Deuteranopia</label>
-                <label><input type="radio" name="colorblind-mode" value="tritanopia" /> Tritanopia</label>
-                <label><input type="radio" name="colorblind-mode" value="achromatopsia" /> Acromatopsia</label>
-            </fieldset>
-
-            <div class="font-controls accessibility-group">
-                <span id="font-size-label">Tamanho da Fonte (Texto Transcrito):</span>
-                <div id="font-size-controls" role="group" aria-labelledby="font-size-label">
-                    <button id="decrease-font-btn" type="button" aria-label="Diminuir tamanho da fonte">-</button>
-                    <span id="font-size-value" aria-live="polite">16px</span>
-                    <button id="increase-font-btn" type="button" aria-label="Aumentar tamanho da fonte">+</button>
-                </div>
-                <label for="font-size-slider" class="visually-hidden">Seletor de ajuste fino do tamanho da fonte</label>
-                <input type="range" id="font-size-slider" min="12" max="32" value="16" step="2" aria-label="Ajustar tamanho da fonte com controle deslizante" aria-controls="font-size-value" />
-            </div>
-             <button id="close-accessibility-panel-btn" class="control-btn" type="button" aria-label="Fechar menu de acessibilidade"><i class="fas fa-times" aria-hidden="true"></i> Fechar</button>
+      <fieldset class="accessibility-group">
+        <legend>Modos para Daltonismo:</legend>
+        <label>
+        <input type="checkbox" onchange="toggleColorBlindMode('protanopia')">
+        Protanopia
+      </label>
+      <label>
+        <input type="checkbox" onchange="toggleColorBlindMode('deuteranopia')">
+        Deuteranopia
+      </label>
+      <label>
+        <input type="checkbox" onchange="toggleColorBlindMode('tritanopia')">
+        Tritanopia
+      </label>
+      <label>
+        <input type="checkbox" onchange="toggleColorBlindMode('achromatopsia')">
+        Acromatopsia
+      </label>
+      </fieldset>
+      
+      <div class="font-controls accessibility-group">
+        <span>Tamanho da Fonte:</span>
+        <div id="font-size-controls">
+          <button onclick="adjustFontSize('decrease')" aria-label="Diminuir fonte">-</button>
+          <span id="font-size-value">14px</span>
+          <button onclick="adjustFontSize('increase')" aria-label="Aumentar fonte">+</button>
         </div>
+        <input type="range" min="12" max="28" value="14" step="2" 
+               oninput="adjustFontSize(parseInt(this.value))"
+               aria-label="Seletor de tamanho de fonte">
+      </div>
+      <button onclick="lerTexto()" aria-label="Ler conteúdo da página">
+        Ler Conteúdo
+      </button>
     </div>
+  </div>
       <div vw class="enabled">
     <div vw-access-button class="active"></div>
     <div vw-plugin-wrapper>
